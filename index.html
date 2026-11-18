@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Árbol de los Deseos</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Reproductor oculto de YouTube para música de fondo -->
+  <div id="ytPlayerWrapper" class="yt-hidden-player" aria-hidden="true">
+    <div id="ytBackgroundPlayer"></div>
+  </div>
+
+  <!-- Notificación flotante -->
+  <div id="toastNotification" class="toast-notification"></div>
+
+  <!-- Barra flotante superior: Ruedita + Cartelito Argentina + Botón Silenciar -->
+  <div class="top-left-bar">
+    <div class="top-bar-left-group">
+      <button id="btnAdminGear" class="admin-gear-btn" title="Administración" aria-label="Administración">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+
+      <button id="btnWeatherMeme" class="weather-pill-btn" title="Hacé clic para alternar el clima">
+        <span class="weather-icon" id="weatherIcon">❄️</span>
+        <span id="weatherText">En Argentina tenemos 47 grados a la sombra pero la nieve quedaba más chill</span>
+      </button>
+    </div>
+
+    <button id="btnMuteMusic" class="mute-music-btn" title="Silenciar / Activar música" aria-label="Silenciar o activar música">
+      <svg id="iconSoundOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+      <svg id="iconSoundOff" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="23" y1="9" x2="17" y2="15"></line>
+        <line x1="17" y1="9" x2="23" y2="15"></line>
+      </svg>
+      <span class="mute-label" id="muteLabel">Sonido</span>
+    </button>
+  </div>
+
+  <!-- Partículas de nieve en profundidad -->
+  <div class="snow-container" id="snowContainer"></div>
+
+  <!-- Cabecera minimalista y elegante -->
+  <header class="header">
+    <div class="badge-top">CHAU 2026, HOLA 2027 💫</div>
+    <h1>Nuestro arbolito de deseos</h1>
+    <p>Escribí tu deseo para el próximo año, dedicale algo a alguien especial o dejá un regalito para abrir después de las doce.</p>
+
+    <!-- Leyenda de estados -->
+    <div class="legend">
+      <span class="legend-item"><i class="dot pending"></i> Deseo en espera</span>
+      <span class="legend-item"><i class="dot fulfilled"></i> Deseo cumplido</span>
+      <span class="legend-item"><i class="dot gifted"></i> Para alguien</span>
+    </div>
+  </header>
+
+  <!-- Escenario del Árbol Realista -->
+  <main class="tree-stage">
+    <div class="tree-ambient-glow"></div>
+    <div class="tree-wrapper" id="treeWrapper">
+      
+      <!-- SVG Árbol de Pino Frondoso y Detallado -->
+      <svg class="christmas-tree" viewBox="0 0 700 840" id="treeSvg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pineDark" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#133a2c"/>
+            <stop offset="55%" stop-color="#0b261d"/>
+            <stop offset="100%" stop-color="#061711"/>
+          </linearGradient>
+          <linearGradient id="pineMid" x1="20%" y1="0%" x2="80%" y2="100%">
+            <stop offset="0%" stop-color="#1f5742"/>
+            <stop offset="60%" stop-color="#12392b"/>
+            <stop offset="100%" stop-color="#092118"/>
+          </linearGradient>
+          <linearGradient id="pineLight" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#2c7056"/>
+            <stop offset="70%" stop-color="#174534"/>
+            <stop offset="100%" stop-color="#0d2b20"/>
+          </linearGradient>
+          <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#2b180c"/>
+            <stop offset="40%" stop-color="#4e2e18"/>
+            <stop offset="80%" stop-color="#361f0f"/>
+            <stop offset="100%" stop-color="#1f1108"/>
+          </linearGradient>
+          <radialGradient id="ornamentRed" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#ff8fa3"/>
+            <stop offset="35%" stop-color="#d90429"/>
+            <stop offset="100%" stop-color="#590d22"/>
+          </radialGradient>
+          <radialGradient id="ornamentGold" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#fff3b0"/>
+            <stop offset="40%" stop-color="#ffb703"/>
+            <stop offset="100%" stop-color="#9c6600"/>
+          </radialGradient>
+          <radialGradient id="starGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="35%" stop-color="#ffe169"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </radialGradient>
+          <filter id="branchShadow" x="-15%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#020a07" flood-opacity="0.65"/>
+          </filter>
+          <filter id="warmGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Sombra del árbol en el suelo -->
+        <ellipse cx="350" cy="795" rx="250" ry="28" fill="rgba(0, 0, 0, 0.58)" />
+        <ellipse cx="350" cy="792" rx="185" ry="15" fill="rgba(255, 255, 255, 0.06)" />
+
+        <!-- Tronco realista -->
+        <path d="M312,685 L388,685 L398,790 C370,798 330,798 302,790 Z" fill="url(#trunkGrad)" />
+        <path d="M335,695 L332,788 M362,695 L366,786" stroke="#241308" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+        <!-- CAPA 5 -->
+        <g filter="url(#branchShadow)">
+          <path d="M350,450 C250,530 130,615 55,675 C85,685 115,672 135,688 C165,705 195,685 225,702 C260,718 305,702 350,715 C395,702 440,718 475,702 C505,685 535,705 565,688 C585,672 615,685 645,675 C570,615 450,530 350,450 Z" fill="url(#pineDark)"/>
+        </g>
+        <!-- CAPA 4 -->
+        <g filter="url(#branchShadow)">
+          <path d="M350,340 C265,415 165,495 95,555 C122,565 150,552 172,568 C202,584 232,565 262,580 C292,594 322,582 350,592 C378,582 408,594 438,580 C468,565 498,584 528,568 C550,552 578,565 605,555 C535,495 435,415 350,340 Z" fill="url(#pineMid)"/>
+        </g>
+        <!-- CAPA 3 -->
+        <g filter="url(#branchShadow)">
+          <path d="M350,240 C280,305 195,375 135,432 C160,442 185,430 208,444 C235,458 265,442 292,455 C315,465 335,456 350,464 C365,456 385,465 408,455 C435,442 465,458 492,444 C515,430 540,442 565,432 C505,375 420,305 350,240 Z" fill="url(#pineDark)"/>
+        </g>
+        <!-- CAPA 2 -->
+        <g filter="url(#branchShadow)">
+          <path d="M350,150 C295,205 230,265 180,315 C202,324 225,314 246,326 C270,338 295,325 318,335 C332,341 342,336 350,342 C358,336 368,341 382,335 C405,325 430,338 454,326 C475,314 498,324 520,315 C470,265 405,205 350,150 Z" fill="url(#pineMid)"/>
+        </g>
+        <!-- CAPA 1 -->
+        <g filter="url(#branchShadow)">
+          <path d="M350,72 C312,118 265,165 228,205 C248,212 268,204 286,214 C306,224 328,214 350,222 C372,214 394,224 414,214 C432,204 452,212 472,205 C435,165 388,118 350,72 Z" fill="url(#pineLight)"/>
+        </g>
+
+        <!-- Guirnaldas -->
+        <path d="M255,190 Q350,235 442,188" fill="none" stroke="rgba(255, 215, 100, 0.32)" stroke-width="2" stroke-dasharray="4 4"/>
+        <path d="M202,298 Q350,365 495,295" fill="none" stroke="rgba(255, 215, 100, 0.32)" stroke-width="2" stroke-dasharray="4 4"/>
+        <path d="M155,415 Q350,505 542,412" fill="none" stroke="rgba(255, 215, 100, 0.32)" stroke-width="2" stroke-dasharray="4 4"/>
+        <path d="M110,540 Q350,645 588,535" fill="none" stroke="rgba(255, 215, 100, 0.32)" stroke-width="2" stroke-dasharray="4 4"/>
+
+        <!-- Esferas -->
+        <circle cx="290" cy="185" r="8" fill="url(#ornamentGold)" />
+        <circle cx="405" cy="200" r="7" fill="url(#ornamentRed)" />
+        <circle cx="245" cy="295" r="9" fill="url(#ornamentRed)" />
+        <circle cx="445" cy="305" r="9" fill="url(#ornamentGold)" />
+        <circle cx="345" cy="325" r="8" fill="url(#ornamentRed)" />
+        <circle cx="195" cy="415" r="10" fill="url(#ornamentGold)" />
+        <circle cx="495" cy="420" r="10" fill="url(#ornamentRed)" />
+        <circle cx="310" cy="445" r="9" fill="url(#ornamentGold)" />
+        <circle cx="155" cy="540" r="11" fill="url(#ornamentRed)" />
+        <circle cx="535" cy="545" r="11" fill="url(#ornamentGold)" />
+        <circle cx="265" cy="568" r="10" fill="url(#ornamentRed)" />
+        <circle cx="425" cy="565" r="10" fill="url(#ornamentGold)" />
+        <circle cx="125" cy="660" r="11" fill="url(#ornamentGold)" />
+        <circle cx="565" cy="658" r="11" fill="url(#ornamentRed)" />
+        <circle cx="350" cy="685" r="11" fill="url(#ornamentRed)" />
+
+        <!-- Luces cálidas -->
+        <g filter="url(#warmGlow)">
+          <circle cx="330" cy="145" r="3.5" fill="#fff3b0" class="light"/>
+          <circle cx="380" cy="170" r="3" fill="#ffd166" class="light"/>
+          <circle cx="275" cy="255" r="4" fill="#fff3b0" class="light"/>
+          <circle cx="365" cy="275" r="3.5" fill="#ffd166" class="light"/>
+          <circle cx="425" cy="260" r="4" fill="#fff3b0" class="light"/>
+          <circle cx="220" cy="365" r="4" fill="#ffd166" class="light"/>
+          <circle cx="320" cy="385" r="4" fill="#fff3b0" class="light"/>
+          <circle cx="465" cy="375" r="4" fill="#ffd166" class="light"/>
+          <circle cx="175" cy="485" r="4.5" fill="#fff3b0" class="light"/>
+          <circle cx="285" cy="510" r="4" fill="#ffd166" class="light"/>
+          <circle cx="395" cy="505" r="4.5" fill="#fff3b0" class="light"/>
+          <circle cx="515" cy="490" r="4" fill="#ffd166" class="light"/>
+          <circle cx="145" cy="615" r="4.5" fill="#ffd166" class="light"/>
+          <circle cx="240" cy="635" r="4.5" fill="#fff3b0" class="light"/>
+          <circle cx="355" cy="625" r="4.5" fill="#ffd166" class="light"/>
+          <circle cx="475" cy="632" r="4.5" fill="#fff3b0" class="light"/>
+          <circle cx="575" cy="615" r="4" fill="#ffd166" class="light"/>
+        </g>
+
+        <!-- Estrella interactiva en la punta -->
+        <g transform="translate(350, 62)" filter="url(#warmGlow)" class="star-group" id="treeStarBtn">
+          <g class="star-inner" id="starInner">
+            <circle cx="0" cy="0" r="38" fill="none" stroke="#fde047" stroke-width="2" class="star-ring" id="starRing"/>
+            <circle cx="0" cy="0" r="42" fill="transparent"/>
+            <polygon points="0,-34 8,-10 33,-10 13,5 20,29 0,15 -20,29 -13,5 -33,-10 -8,-10" fill="url(#starGrad)"/>
+            <circle cx="0" cy="0" r="6" fill="#ffffff" opacity="0.85"/>
+          </g>
+        </g>
+      </svg>
+
+      <!-- Capa de destellos mágicos de la estrella -->
+      <div class="star-sparkles-layer" id="starSparklesLayer"></div>
+
+      <!-- Capa interactiva donde se cuelgan los papelitos -->
+      <div class="wishes-layer" id="wishesLayer"></div>
+
+      <!-- Capa donde se apilan los regalos debajo del árbol -->
+      <div class="gifts-pile-layer" id="giftsPileLayer"></div>
+
+      <!-- Botones de acción abajo a la derecha del arbolito -->
+      <div class="tree-actions-dock">
+        <button id="btnOpenModal" class="btn-dock btn-dock-crimson">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          Escribí tu deseo
+        </button>
+        <button id="btnOpenSomeoneModal" class="btn-dock btn-dock-emerald">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Dejale un deseo a alguien
+        </button>
+        <button id="btnOpenGiftModal" class="btn-dock btn-dock-gold">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          Dejá un regalito en el árbol
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Pie de página -->
+  <footer class="site-footer">
+    <a href="https://agenciapororo.github.io/pororo/" target="_blank" rel="noopener noreferrer">
+      Creado por Pororó 🍿
+    </a>
+  </footer>
+
+  <!-- MODAL 1: Escribir deseo propio -->
+  <div class="modal-overlay" id="writeModal">
+    <div class="modal-card paper-sheet" id="paperSheet">
+      <button class="close-btn" id="closeWriteModal" aria-label="Cerrar">×</button>
+      <div class="modal-eyebrow">DESEO PERSONAL</div>
+      <h2>Tu deseo para el próximo año</h2>
+      <form id="wishForm">
+        <div class="form-group">
+          <label for="userName">Tu nombre o apodo</label>
+          <input type="text" id="userName" required placeholder="Ej. Sofía" maxlength="25">
+        </div>
+        <div class="form-group">
+          <label for="userWish">¿Qué deseas que se haga realidad?</label>
+          <textarea id="userWish" rows="4" required placeholder="Escribe aquí tu deseo con claridad y convicción..." maxlength="220"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="userEmail">Correo electrónico para el recordatorio</label>
+          <input type="email" id="userEmail" required placeholder="nombre@correo.com">
+          <small>Te enviaremos un correo con el botón privado para marcarlo como cumplido y programaremos un recordatorio para el 23/12/2027.</small>
+        </div>
+        <button type="submit" id="btnSubmitWish" class="btn-fold">Doblar papel y colgar en el árbol</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Dejarle un deseo a alguien -->
+  <div class="modal-overlay" id="someoneModal">
+    <div class="modal-card paper-sheet" id="someonePaperSheet">
+      <button class="close-btn" id="closeSomeoneModal" aria-label="Cerrar">×</button>
+      <div class="modal-eyebrow">DESEO DEDICADO</div>
+      <h2>Dejale un deseo a alguien</h2>
+      <form id="someoneWishForm">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="wishFrom">De:</label>
+            <input type="text" id="wishFrom" required placeholder="Tu nombre" maxlength="22">
+          </div>
+          <div class="form-group">
+            <label for="wishTo">Para:</label>
+            <input type="text" id="wishTo" required placeholder="Destinatario" maxlength="22">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="someoneWishText">Tu deseo para esa persona</label>
+          <textarea id="someoneWishText" rows="4" required placeholder="Escribe lo mejor que le deseas para este año..." maxlength="220"></textarea>
+        </div>
+        <button type="submit" id="btnSubmitSomeone" class="btn-fold">Doblar y colgar deseo en el árbol</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Dejar un regalito en el árbol -->
+  <div class="modal-overlay" id="giftModal">
+    <div class="modal-card paper-sheet modal-scrollable" id="giftPaperSheet">
+      <button class="close-btn" id="closeGiftModal" aria-label="Cerrar">×</button>
+      <div class="modal-eyebrow">REGALO SIMBÓLICO</div>
+      <h2>Dejá un regalito en el árbol</h2>
+      <form id="giftForm">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="giftFrom">De:</label>
+            <input type="text" id="giftFrom" required placeholder="Tu nombre" maxlength="22">
+          </div>
+          <div class="form-group">
+            <label for="giftTo">Para:</label>
+            <input type="text" id="giftTo" required placeholder="Destinatario" maxlength="22">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="giftContent">¿Qué es el regalo?</label>
+          <textarea id="giftContent" rows="2" required placeholder="Ej. Un abrazo enorme, esta canción que me recuerda a vos..." maxlength="180"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="giftYoutube">Canción o video de YouTube (opcional)</label>
+          <input type="url" id="giftYoutube" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+
+        <div class="form-group">
+          <label for="giftImageInput">Foto o imagen (opcional)</label>
+          <label class="file-upload-box" for="giftImageInput">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span id="giftImageLabel">Subir una foto desde tu dispositivo</span>
+          </label>
+          <input type="file" id="giftImageInput" accept="image/*" style="display: none;">
+          <div id="giftImagePreviewWrap" class="upload-preview-wrap" style="display: none;">
+            <img id="giftImagePreview" src="" alt="Vista previa">
+            <button type="button" id="btnRemoveGiftImage" class="btn-remove-img">Quitar foto</button>
+          </div>
+        </div>
+
+        <div class="gift-customizer">
+          <div class="gift-preview-stage">
+            <div class="gift-box-preview" id="giftBoxPreview">
+              <div class="gift-lid" id="giftLidPreview"></div>
+              <div class="gift-ribbon-v" id="giftRibbonVPreview"></div>
+              <div class="gift-ribbon-h" id="giftRibbonHPreview"></div>
+              <div class="gift-bow" id="giftBowPreview"></div>
+            </div>
+          </div>
+          <div class="gift-pickers">
+            <div class="picker-group">
+              <span>Papel de envolver</span>
+              <div class="swatches" id="wrapColorSwatches">
+                <button type="button" class="swatch active" data-color="#be123c" style="background:#be123c" aria-label="Rojo"></button>
+                <button type="button" class="swatch" data-color="#14533c" style="background:#14533c" aria-label="Verde pino"></button>
+                <button type="button" class="swatch" data-color="#1d4ed8" style="background:#1d4ed8" aria-label="Azul real"></button>
+                <button type="button" class="swatch" data-color="#7e22ce" style="background:#7e22ce" aria-label="Violeta"></button>
+                <button type="button" class="swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="Dorado"></button>
+                <button type="button" class="swatch" data-color="#f8fafc" style="background:#f8fafc; border-color:#cbd5e1" aria-label="Blanco nieve"></button>
+              </div>
+            </div>
+            <div class="picker-group">
+              <span>Color del moño</span>
+              <div class="swatches" id="ribbonColorSwatches">
+                <button type="button" class="swatch active" data-color="#fbbf24" style="background:#fbbf24" aria-label="Dorado"></button>
+                <button type="button" class="swatch" data-color="#e11d48" style="background:#e11d48" aria-label="Carmesí"></button>
+                <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff; border-color:#cbd5e1" aria-label="Blanco"></button>
+                <button type="button" class="swatch" data-color="#10b981" style="background:#10b981" aria-label="Esmeralda"></button>
+                <button type="button" class="swatch" data-color="#38bdf8" style="background:#38bdf8" aria-label="Celeste"></button>
+                <button type="button" class="swatch" data-color="#1e293b" style="background:#1e293b" aria-label="Negro elegante"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSubmitGift" class="btn-fold">Dejar en el árbol</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Leer un deseo colgado (solo lectura, sin botón público de cumplir) -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal-card view-paper" id="viewPaper">
+      <button class="close-btn" id="closeViewModal" aria-label="Cerrar">×</button>
+      <div class="status-badge" id="viewStatus">Esperando el próximo año</div>
+      <p class="wish-author" id="viewAuthorLine"></p>
+      <blockquote class="wish-text" id="viewText"></blockquote>
+      <div class="wish-dates-box">
+        <p class="wish-date" id="viewDate"></p>
+        <p class="wish-fulfilled-date" id="viewFulfilledDate" style="display: none;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Abrir un regalo apilado -->
+  <div class="modal-overlay" id="viewGiftModal">
+    <div class="modal-card view-paper modal-scrollable">
+      <button class="close-btn" id="closeViewGiftModal" aria-label="Cerrar">×</button>
+      <div class="status-badge fulfilled">Regalo al pie del árbol</div>
+      <p class="wish-author">De <strong id="viewGiftFrom"></strong> para <strong id="viewGiftTo"></strong></p>
+      <blockquote class="wish-text" id="viewGiftText"></blockquote>
+      <div id="viewGiftMedia" class="gift-media-container"></div>
+      <p class="wish-date" id="viewGiftDate"></p>
+    </div>
+  </div>
+
+  <!-- MODAL 6: Panel de Administración (Contraseña: deseospororo) -->
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal-card admin-box">
+      <button class="close-btn" id="closeAdminModal" aria-label="Cerrar">×</button>
+      <div class="modal-eyebrow">ADMINISTRACIÓN</div>
+      <h2>Gestión del árbol</h2>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label for="adminPassInput">Ingresa la contraseña para continuar</label>
+          <input type="password" id="adminPassInput" required placeholder="Contraseña">
+          <p id="adminErrorMsg" class="admin-error">Contraseña incorrecta. Intenta nuevamente.</p>
+        </div>
+        <button type="submit" class="btn-fold">Ingresar</button>
+      </form>
+
+      <div id="adminPanelContent" style="display: none;">
+        <p class="admin-sub">Elimina deseos colgados o regalos apilados:</p>
+        <div id="adminWishesList" class="admin-wishes-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 7: Celebración al volver desde el botón del mail -->
+  <div class="modal-overlay" id="celebrationModal">
+    <div class="modal-card view-paper" style="text-align: center;">
+      <button class="close-btn" id="closeCelebrationModal" aria-label="Cerrar">×</button>
+      <div class="status-badge fulfilled">✨ ¡DESEO CUMPLIDO! ✨</div>
+      <h2 id="celebrationTitle">¡Felicitaciones!</h2>
+      <blockquote class="wish-text" id="celebrationWishText" style="text-align: left;"></blockquote>
+      <p id="celebrationDatesInfo" style="font-size: 0.84rem; color: #64748b; margin-bottom: 0.8rem;"></p>
+      <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1.2rem;">
+        Tu papelito en el árbol ya brilla en dorado para que todos celebren con vos.
+      </p>
+      <button id="btnCloseCelebration" class="btn-gold">Ver mi deseo dorado en el árbol</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
