@@ -48,17 +48,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Reproductor de YouTube oculto */
-.yt-hidden-player {
-  position: fixed;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: -10;
-}
-
 /* Modo calorcito argentino (opcional al hacer clic en el cartelito) */
 body.summer-mode {
   background: 
@@ -297,8 +286,9 @@ button {
   width: 100%;
   max-width: 860px;
   display: flex;
-  justify-content: center;
-  padding: 0.5rem 1rem 2rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem 1.75rem;
   z-index: 5;
   flex: 1;
 }
@@ -318,7 +308,7 @@ button {
 .tree-wrapper {
   position: relative;
   width: 100%;
-  max-width: 680px;
+  max-width: 660px;
   aspect-ratio: 700 / 840;
 }
 
@@ -418,21 +408,24 @@ button {
   100% { opacity: 1; }
 }
 
-/* Dock de botones compactos abajo a la derecha del arbolito */
+/* Dock de botones siempre DEBAJO del arbolito y de los regalos */
 .tree-actions-dock {
-  position: absolute;
-  bottom: 1.5%;
-  right: -2%;
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.45rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.15rem;
+  width: 100%;
+  max-width: 680px;
   z-index: 30;
 }
 
 .btn-dock {
-  padding: 0.54rem 0.95rem;
-  font-size: 0.78rem;
+  padding: 0.68rem 1.15rem;
+  font-size: 0.82rem;
   font-weight: 600;
   border-radius: 999px;
   backdrop-filter: blur(10px);
@@ -451,15 +444,15 @@ button {
 }
 
 .btn-dock-emerald {
-  background: rgba(16, 78, 56, 0.88);
+  background: rgba(16, 78, 56, 0.92);
   color: #ecfdf5;
-  border: 1px solid rgba(52, 211, 153, 0.35);
+  border: 1px solid rgba(52, 211, 153, 0.38);
   box-shadow: 0 6px 16px -4px rgba(6, 78, 59, 0.65);
 }
 
 .btn-dock-emerald:hover {
-  background: rgba(20, 95, 68, 0.95);
-  border-color: rgba(52, 211, 153, 0.6);
+  background: rgba(20, 95, 68, 0.98);
+  border-color: rgba(52, 211, 153, 0.65);
 }
 
 .btn-dock-gold {
@@ -576,11 +569,11 @@ button {
 /* --- PILA DE REGALOS DEBAJO DEL ÁRBOL --- */
 .gifts-pile-layer {
   position: absolute;
-  bottom: 3.2%;
+  bottom: 2.5%;
   left: 50%;
   transform: translateX(-50%);
-  width: 66%;
-  height: 18%;
+  width: 68%;
+  height: 17%;
   pointer-events: none;
   z-index: 20;
 }
@@ -668,7 +661,7 @@ button {
 .site-footer {
   width: 100%;
   text-align: center;
-  padding: 1.5rem 1rem 2rem;
+  padding: 1rem 1rem 2rem;
   z-index: 15;
 }
 
@@ -1257,17 +1250,12 @@ button {
   }
 
   .tree-actions-dock {
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1.1rem;
+    margin-top: 1.25rem;
     gap: 0.55rem;
   }
 
   .btn-dock {
-    padding: 0.62rem 1rem;
+    padding: 0.64rem 1.05rem;
     font-size: 0.8rem;
   }
 }
@@ -1299,7 +1287,7 @@ button {
   }
 
   .tree-stage {
-    padding: 0.25rem 0.5rem 1.25rem;
+    padding: 0.25rem 0.65rem 1.25rem;
   }
 
   .hanging-tag {
@@ -1312,23 +1300,26 @@ button {
     font-size: 0.58rem;
   }
 
-  /* Escalar cajitas de regalo en pantallas chicas */
+  /* Escalar cajitas de regalo en pantallas chicas manteniendo su base dentro del árbol */
   .gifts-pile-layer {
-    transform: translateX(-50%) scale(0.76);
+    bottom: 2.2%;
+    transform: translateX(-50%) scale(0.75);
     transform-origin: bottom center;
   }
 
   .tree-actions-dock {
     flex-direction: column;
     width: 100%;
-    padding: 0 0.5rem;
+    margin-top: 1.35rem;
+    padding: 0 0.35rem;
+    gap: 0.6rem;
   }
 
   .btn-dock {
     width: 100%;
     justify-content: center;
-    padding: 0.72rem 1rem;
-    font-size: 0.84rem;
+    padding: 0.76rem 1rem;
+    font-size: 0.85rem;
   }
 
   .modal-overlay {

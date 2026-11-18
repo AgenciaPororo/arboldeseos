@@ -11,10 +11,8 @@
 </head>
 <body>
 
-  <!-- Reproductor oculto de YouTube para música de fondo -->
-  <div id="ytPlayerWrapper" class="yt-hidden-player" aria-hidden="true">
-    <div id="ytBackgroundPlayer"></div>
-  </div>
+  <!-- Reproductor nativo HTML5 para música de fondo sin publicidades -->
+  <audio id="bgMusicAudio" loop preload="auto"></audio>
 
   <!-- Notificación flotante -->
   <div id="toastNotification" class="toast-notification"></div>
@@ -215,22 +213,22 @@
 
       <!-- Capa donde se apilan los regalos debajo del árbol -->
       <div class="gifts-pile-layer" id="giftsPileLayer"></div>
+    </div>
 
-      <!-- Botones de acción abajo a la derecha del arbolito -->
-      <div class="tree-actions-dock">
-        <button id="btnOpenModal" class="btn-dock btn-dock-crimson">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-          Escribí tu deseo
-        </button>
-        <button id="btnOpenSomeoneModal" class="btn-dock btn-dock-emerald">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          Dejale un deseo a alguien
-        </button>
-        <button id="btnOpenGiftModal" class="btn-dock btn-dock-gold">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-          Dejá un regalito en el árbol
-        </button>
-      </div>
+    <!-- Botones de acción bien ubicados DEBAJO del arbolito en web y móvil -->
+    <div class="tree-actions-dock">
+      <button id="btnOpenModal" class="btn-dock btn-dock-crimson">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Escribí tu deseo
+      </button>
+      <button id="btnOpenSomeoneModal" class="btn-dock btn-dock-emerald">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Dejale un deseo a alguien
+      </button>
+      <button id="btnOpenGiftModal" class="btn-dock btn-dock-gold">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        Dejá un regalito en el árbol
+      </button>
     </div>
   </main>
 
@@ -373,7 +371,7 @@
     </div>
   </div>
 
-  <!-- MODAL 4: Leer un deseo colgado (solo lectura, sin botón público de cumplir) -->
+  <!-- MODAL 4: Leer un deseo colgado -->
   <div class="modal-overlay" id="viewModal">
     <div class="modal-card view-paper" id="viewPaper">
       <button class="close-btn" id="closeViewModal" aria-label="Cerrar">×</button>
@@ -399,7 +397,7 @@
     </div>
   </div>
 
-  <!-- MODAL 6: Panel de Administración (Contraseña: deseospororo) -->
+  <!-- MODAL 6: Panel de Administración -->
   <div class="modal-overlay" id="adminModal">
     <div class="modal-card admin-box">
       <button class="close-btn" id="closeAdminModal" aria-label="Cerrar">×</button>

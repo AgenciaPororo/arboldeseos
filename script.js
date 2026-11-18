@@ -1,88 +1,13 @@
 // =========================================================================
-// REPRODUCTOR DE MÚSICA DE FONDO CON YOUTUBE IFRAME API
+// REPRODUCTOR DE MÚSICA DE FONDO NATIVO (MP3 PROPIO SIN PUBLICIDADES)
 // =========================================================================
-const WINTER_VIDEO_ID = 'yXQViqx6GMY';
-const SUMMER_VIDEO_ID = 'phC1sGpEeg4';
+// Subí tus archivos MP3 a una carpeta "audio/" en tu GitHub Pages (o pegá acá tus enlaces directos de Cloudinary / Archive.org)
+const WINTER_AUDIO_URL = 'audio/invierno.mp3';
+const SUMMER_AUDIO_URL = 'audio/verano.mp3';
 
-let ytPlayer = null;
-let isPlayerReady = false;
 let isMusicMuted = false;
 let hasStartedPlayback = false;
 let currentModeSummer = false;
-
-// Cargar el script oficial de YouTube IFrame API
-(function loadYouTubeAPI() {
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  const firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-})();
-
-window.onYouTubeIframeAPIReady = function () {
-  ytPlayer = new YT.Player('ytBackgroundPlayer', {
-    height: '1',
-    width: '1',
-    videoId: WINTER_VIDEO_ID,
-    playerVars: {
-      autoplay: 1,
-      loop: 1,
-      playlist: WINTER_VIDEO_ID,
-      controls: 0,
-      disablekb: 1,
-      fs: 0,
-      modestbranding: 1,
-      playsinline: 1
-    },
-    events: {
-      onReady: (event) => {
-        isPlayerReady = true;
-        event.target.setVolume(45);
-        if (!isMusicMuted) {
-          event.target.playVideo();
-        }
-      },
-      onStateChange: (event) => {
-        // Asegurar bucle continuo
-        if (event.data === YT.PlayerState.ENDED && !isMusicMuted) {
-          event.target.playVideo();
-        }
-        if (event.data === YT.PlayerState.PLAYING) {
-          hasStartedPlayback = true;
-        }
-      }
-    }
-  });
-};
-
-function ensureAudioStartsOnFirstInteraction() {
-  if (hasStartedPlayback || isMusicMuted || !isPlayerReady || !ytPlayer) return;
-  try {
-    ytPlayer.unMute();
-    ytPlayer.setVolume(45);
-    ytPlayer.playVideo();
-    hasStartedPlayback = true;
-  } catch (e) {}
-}
-
-function switchBackgroundMusic(summer) {
-  currentModeSummer = summer;
-  if (!isPlayerReady || !ytPlayer) return;
-
-  const targetVideoId = summer ? SUMMER_VIDEO_ID : WINTER_VIDEO_ID;
-  ytPlayer.loadPlaylist({
-    playlist: [targetVideoId],
-    index: 0,
-    startSeconds: 0
-  });
-
-  if (isMusicMuted) {
-    ytPlayer.mute();
-  } else {
-    ytPlayer.unMute();
-    ytPlayer.setVolume(45);
-    ytPlayer.playVideo();
-  }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
@@ -91,6 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const FIREBASE_DB_URL = 'https://deseosarbol-default-rtdb.firebaseio.com';
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAlDD-x5lcx5_fxA1uORG2qKCAaAWTi7eRazaXEyM1g62QJonAXqMQruT1FyAh0WG0/exec';
   const ADMIN_PASS = 'deseospororo';
+
+  // Elemento de audio nativo
+  const bgMusicAudio = document.getElementById('bgMusicAudio');
+  bgMusicAudio.src = WINTER_AUDIO_URL;
+  bgMusicAudio.volume = 0.45;
 
   // Capas del árbol
   const wishesLayer = document.getElementById('wishesLayer');
@@ -169,7 +99,36 @@ document.addEventListener('DOMContentLoaded', () => {
   let uploadedGiftImageBase64 = '';
   let isSummerMode = false;
 
-  // Iniciar música con la primera interacción en cualquier parte de la pantalla
+  // Control de reproducción del audio HTML5
+  function ensureAudioStartsOnFirstInteraction() {
+    if (hasStartedPlayback || isMusicMuted) return;
+    bgMusicAudio.play()
+      .then(() => {
+        hasStartedPlayback = true;
+      })
+      .catch(() => {});
+  }
+
+  function switchBackgroundMusic(summer) {
+    currentModeSummer = summer;
+    const targetSrc = summer ? SUMMER_AUDIO_URL : WINTER_AUDIO_URL;
+
+    if (!bgMusicAudio.src.endsWith(targetSrc)) {
+      bgMusicAudio.src = targetSrc;
+      bgMusicAudio.load();
+    }
+
+    if (!isMusicMuted) {
+      bgMusicAudio.play()
+        .then(() => {
+          hasStartedPlayback = true;
+        })
+        .catch(() => {});
+    }
+  }
+
+  // Intentar reproducción automática y asegurar en la primera interacción
+  ensureAudioStartsOnFirstInteraction();
   ['click', 'touchstart', 'keydown'].forEach(evt => {
     document.addEventListener(evt, ensureAudioStartsOnFirstInteraction, { once: true });
   });
@@ -184,19 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
       iconSoundOn.style.display = 'none';
       iconSoundOff.style.display = 'block';
       muteLabel.textContent = 'Silenciado';
-      if (isPlayerReady && ytPlayer) {
-        ytPlayer.mute();
-      }
+      bgMusicAudio.pause();
     } else {
       iconSoundOn.style.display = 'block';
       iconSoundOff.style.display = 'none';
       muteLabel.textContent = 'Sonido';
-      if (isPlayerReady && ytPlayer) {
-        ytPlayer.unMute();
-        ytPlayer.setVolume(45);
-        ytPlayer.playVideo();
-        hasStartedPlayback = true;
-      }
+      bgMusicAudio.play()
+        .then(() => {
+          hasStartedPlayback = true;
+        })
+        .catch(() => {});
     }
   });
 
@@ -737,7 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
   closeCelebrationModal.addEventListener('click', () => celebrationModal.classList.remove('active'));
   btnCloseCelebration.addEventListener('click', () => celebrationModal.classList.remove('active'));
 
-  // --- MODAL 4: Ver detalle de deseo (solo lectura, con ambas fechas si está cumplido) ---
+  // --- MODAL 4: Ver detalle de deseo ---
   function openWishDetail(id) {
     const wish = wishesCache.find(w => w.id === id);
     if (!wish) return;
@@ -774,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   closeViewModal.addEventListener('click', () => viewModal.classList.remove('active'));
 
-  // --- MODAL 5: Ver detalle de regalo (con Foto y/o YouTube) ---
+  // --- MODAL 5: Ver detalle de regalo ---
   function openGiftDetail(id) {
     const gift = giftsCache.find(g => g.id === id);
     if (!gift) return;
@@ -825,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // 7. MODAL 6: Administración (Eliminación en Firebase + Cierre automático)
+  // 7. MODAL 6: Administración
   // =========================================================================
   btnAdminGear.addEventListener('click', () => {
     adminLoginForm.reset();
